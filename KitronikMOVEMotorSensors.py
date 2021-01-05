@@ -1,4 +1,4 @@
-# microbit-module: KitronikMOVEMotorSensors@1.0.0
+# microbit-module: KitronikMOVEMotorSensors@1.1.0
 # Copyright (c) Kitronik Ltd 2019. 
 #
 # The MIT License (MIT)
@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from microbit import i2c, pin13, pin14
+from microbit import i2c, pin1, pin2, pin13, pin14
 import machine
 import math
 import utime
@@ -44,8 +44,21 @@ class MOVEMotorSensors:
     def distanceInch(self):
         return (self.distanceCm() * 0.3937)
 
+    def lineFollowCal(self):
+        self.rightLineSensor = pin1.read_analog()
+        self.leftLineSensor = pin2.read_analog()
+        #calculate the middle value between the two sensor readings
+        offset = abs(self.rightLineSensor-self.leftLineSensor)/2
+        #apply the offset to each reading so that it neutralises any difference
+        if self.leftLineSensor > self.rightLineSensor:
+            self.leftLfOffset = -offset
+            self.rightLfOffset = offset
+        else:
+            self.leftLfOffset = offset
+            self.rightLfOffset = -offset
+  
     def readLineFollow(self, sensor):
         if sensor == "left":
-            return pin2.read_analog()
+            return pin2.read_analog() + self.leftLfOffset
         elif sensor == "right":
-            return pin1.read_analog()
+            return pin1.read_analog() + self.rightLfOffset

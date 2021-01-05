@@ -25,9 +25,10 @@
 from KitronikMOVEMotorSensors import *
 
 sensor =  MOVEMotorSensors
+sensor.lineFollowCal(sensor)
 while True:
     display.show(sensor.distanceCm(sensor))
     sleep(1)
     display.show(sensor.distanceInch(sensor))
-    leftSensor = readLineFollow(sensor, "left")
-    rightSensor = readLineFollow(sensor, "right")
+    leftSensor = sensor.readLineFollow(sensor, "left")
+    rightSensor = sensor.readLineFollow(sensor, "right")
