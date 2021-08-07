@@ -22,13 +22,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from utime import sleep
 from KitronikMOVEMotorSensors import *
 
-sensor =  MOVEMotorSensors
-sensor.lineFollowCal(sensor)
+sensor =  MOVEMotorSensors()
+sensor.lineFollowCal()
 while True:
-    display.show(sensor.distanceCm(sensor))
+    print("Sonar", sensor.distanceCm(), "cm")
+    print("Sonar", sensor.distanceInch(), "inch")
+    leftSensor = sensor.readLineFollow("left")
+    rightSensor = sensor.readLineFollow("right")
+    print("Left", leftSensor, "Right", rightSensor)
     sleep(1)
-    display.show(sensor.distanceInch(sensor))
-    leftSensor = sensor.readLineFollow(sensor, "left")
-    rightSensor = sensor.readLineFollow(sensor, "right")
