@@ -21,28 +21,35 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from microbit import i2c, pin1, pin2, pin13, pin14
+from microbit import pin1, pin2, pin13, pin14
 import machine
-import math
 import utime
 
 class MOVEMotorSensors:
+    CM_CONVERSION_FACTOR = 0.0343
+    INCH_CONVERSION_FACTOR = 2.54
+    MAX_DISTANCE_TIMEOUT = int(2 * 500 / CM_CONVERSION_FACTOR)
 
+    # Returns -1 when sensor not fitted
+    # Returns -2 when range is over the sensors max distance
     def distanceCm(self):
         pin14.set_pull(pin14.NO_PULL)
+        pin13.set_pull(pin13.NO_PULL)
         pin13.write_digital(0)
         utime.sleep_us(2)
         pin13.write_digital(1)
         utime.sleep_us(10)
         pin13.write_digital(0)             
-        distance = machine.time_pulse_us(pin14,1,1160000)
-        if distance>0:
-            return round(distance/58)
-        else:
-            return round(distance)
+        
+        pulse = machine.time_pulse_us(pin14, 1, self.MAX_DISTANCE_TIMEOUT)
+        
+        if pulse < 0:
+            return pulse
+        
+        return round((pulse * self.CM_CONVERSION_FACTOR) / 2)
 
     def distanceInch(self):
-        return (self.distanceCm() * 0.3937)
+        return round(self.distanceCm() / self.INCH_CONVERSION_FACTOR)
 
     def lineFollowCal(self):
         self.rightLineSensor = pin1.read_analog()
